@@ -9,7 +9,7 @@ namespace Portfolio.Controllers
     {
         private readonly IConfiguration _configuration;
 
-        // Wstrzykujemy konfiguracjÍ, by pobraÊ dane SMTP z appsettings.json
+        // Wstrzykujemy konfiguracjƒô, by pobraƒá dane SMTP z appsettings.json
         public HomeController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -26,71 +26,75 @@ namespace Portfolio.Controllers
         {
             if (ModelState.IsValid)
             {
+                string username = null;
+                string password = null;
                 try
                 {
                     var host = _configuration["BrevoSmtp:Host"];
                     var port = int.Parse(_configuration["BrevoSmtp:Port"]);
-                    var username = _configuration["BrevoSmtp:Username"];
-                    var password = _configuration["BrevoSmtp:Password"];
+                    username = _configuration["BrevoSmtp:Username"];
+                    password = _configuration["BrevoSmtp:Password"];
 
                     using (var client = new SmtpClient(host, port))
                     {
+                        // Kluczowe ustawienie - musi byƒá przed Credentials, by uniknƒÖƒá 5.7.0 Authentication
+                        client.UseDefaultCredentials = false;
                         client.Credentials = new NetworkCredential(username, password);
                         client.EnableSsl = true;
 
                         var mailMessage = new MailMessage
                         {
-                            // Uøywamy z autoryzowanego konta e-mail do wysy≥ki jako nadawca
+                            // U≈ºywamy z autoryzowanego konta e-mail do wysy≈Çki jako nadawca
                             From = new MailAddress("kamileo04@gmail.com", "Portfolio Formularz"),
-                            Subject = $"Nowa wiadomoúÊ z portfolio: {model.Subject ?? "Brak tematu"}",
-                            Body = $"WiadomoúÊ od: {model.Name} ({model.Email})\n\nTreúÊ:\n{model.Message}",
+                            Subject = $"Nowa wiadomo≈õƒá z portfolio: {model.Subject ?? "Brak tematu"}",
+                            Body = $"Wiadomo≈õƒá od: {model.Name} ({model.Email})\n\nTre≈õƒá:\n{model.Message}",
                             IsBodyHtml = false,
                         };
 
-                        // Aby mÛc normalnie "OdpowiedzieÊ" na maila klikajπc w przycisk Odpowiedz:
+                        // Aby m√≥c normalnie "Odpowiedzieƒá" na maila klikajƒÖc w przycisk Odpowiedz:
                         mailMessage.ReplyToList.Add(new MailAddress(model.Email, model.Name));
 
-                        // Tutaj wpisz SW”J adres email, na ktÛry chcesz otrzymywaÊ wiadomoúci
+                        // Tutaj wpisz SW√ìJ adres email, na kt√≥ry chcesz otrzymywaƒá wiadomo≈õci
                         mailMessage.To.Add("kamileo04@gmail.com");
 
                         client.Send(mailMessage);
                     }
 
-                    ViewBag.Message = "WiadomoúÊ zosta≥a wys≥ana pomyúlnie!";
+                    ViewBag.Message = "Wiadomo≈õƒá zosta≈Ça wys≈Çana pomy≈õlnie!";
                     ModelState.Clear(); // Czyszczenie formularza
                     return View(new ContactViewModel());
                 }
                 catch (Exception ex)
                 {
-                    // Wyrzucenie pe≥nego b≥Ídu w oknie konsoli Output (Debug)
-                    System.Diagnostics.Debug.WriteLine("\n=== B£•D WYSY£ANIA MAILA ===");
+                    // Wyrzucenie pe≈Çnego b≈Çƒôdu w oknie konsoli Output (Debug)
+                    System.Diagnostics.Debug.WriteLine("\n=== B≈ÅƒÑD WYSY≈ÅANIA MAILA ===");
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                     System.Diagnostics.Debug.WriteLine("============================\n");
 
-                    // Rzutowanie pe≥nego b≥Ídu do logu w zwyk≥ej konsoli ASP.NET:
-                    Console.WriteLine("\n=== B£•D WYSY£ANIA MAILA ===");
+                    // Rzutowanie pe≈Çnego b≈Çƒôdu do logu w zwyk≈Çej konsoli ASP.NET:
+                    Console.WriteLine("\n=== B≈ÅƒÑD WYSY≈ÅANIA MAILA ===");
                     Console.WriteLine(ex.ToString());
                     Console.WriteLine("============================\n");
 
-                    // Rozbudowany log b≥Ídu na stronie
-                    ViewBag.Error = $"Wystπpi≥ b≥πd podczas wysy≥ania wiadomoúci (szczegÛ≥y w konsoli). Komunikat: {ex.Message}";
+                    // Rozbudowany log b≈Çƒôdu na stronie
+                    ViewBag.Error = $"Smtp Error 5.7.0 -> Username load check: {(!string.IsNullOrEmpty(username) ? username : "NULL_OR_EMPTY")}, pwdLen: {password?.Length ?? 0}. Msg: {ex.Message}";
                 }
             }
             else
             {
-                // Diagnostyka b≥ÍdÛw walidacji formularza, jeúli mail w ogÛle nie przeszed≥ walidacji
-                System.Diagnostics.Debug.WriteLine("\n=== B£ DY WALIDACJI FORMULARZA ===");
+                // Diagnostyka b≈Çƒôd√≥w walidacji formularza, je≈õli mail w og√≥le nie przeszed≈Ç walidacji
+                System.Diagnostics.Debug.WriteLine("\n=== B≈ÅƒòDY WALIDACJI FORMULARZA ===");
                 foreach(var modelState in ModelState.Values)
                 {
                     foreach(var error in modelState.Errors)
                     {
-                        System.Diagnostics.Debug.WriteLine($"B≥πd pol: {error.ErrorMessage}");
+                        System.Diagnostics.Debug.WriteLine($"B≈ÇƒÖd pol: {error.ErrorMessage}");
                     }
                 }
                 System.Diagnostics.Debug.WriteLine("==================================\n");
             }
 
-            // Jeúli formularz jest niepoprawny, wracamy do widoku wyúwietlajπc b≥Ídy
+            // Je≈õli formularz jest niepoprawny, wracamy do widoku wy≈õwietlajƒÖc b≈Çƒôdy
             return View(model);
         }
     }
