@@ -43,8 +43,8 @@ namespace Portfolio.Controllers
                         var mailMessage = new MailMessage
                         {
                             From = new MailAddress("kamileo04@gmail.com", "Portfolio Formularz"),
-                            Subject = $"Nowa wiadomoúÊ z portfolio: {model.Subject ?? "Brak tematu"}",
-                            Body = $"WiadomoúÊ od: {model.Name} ({model.Email})\n\nTreúÊ:\n{model.Message}",
+                            Subject = $"Nowa wiadomo≈õƒá z portfolio: {model.Subject ?? "Brak tematu"}",
+                            Body = $"Wiadomo≈õƒá od: {model.Name} ({model.Email})\n\nTre≈õƒá:\n{model.Message}",
                             IsBodyHtml = false,
                         };
 
@@ -55,28 +55,25 @@ namespace Portfolio.Controllers
                         client.Send(mailMessage);
                     }
 
-                    ViewBag.Message = "WiadomoúÊ zosta≥a wys≥ana pomyúlnie!";
-                    ModelState.Clear(); 
+                    ViewBag.Message = "Wiadomo≈õƒá zosta≈Ça wys≈Çana pomy≈õlnie!";
+                    ModelState.Clear();
                     return View(new ContactViewModel());
                 }
                 catch (Exception ex)
                 {
-                   
-                    Console.WriteLine("\n=== B£•D WYSY£ÅANIA MAILA ===");
+                    Console.WriteLine("\n=== B≈ÅƒÑD WYSY≈ÅANIA MAILA ===");
                     Console.WriteLine(ex.ToString());
                     Console.WriteLine("============================\n");
-
-                    
                 }
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("\n=== B£ òDY WALIDACJI FORMULARZA ===");
+                System.Diagnostics.Debug.WriteLine("\n=== B≈ÅƒòDY WALIDACJI FORMULARZA ===");
                 foreach(var modelState in ModelState.Values)
                 {
                     foreach(var error in modelState.Errors)
                     {
-                        System.Diagnostics.Debug.WriteLine($"B≥πd pol: {error.ErrorMessage}");
+                        System.Diagnostics.Debug.WriteLine($"B≈ÇƒÖd pol: {error.ErrorMessage}");
                     }
                 }
                 System.Diagnostics.Debug.WriteLine("==================================\n");
