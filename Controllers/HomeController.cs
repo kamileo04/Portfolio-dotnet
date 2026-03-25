@@ -9,7 +9,6 @@ namespace Portfolio.Controllers
     {
         private readonly IConfiguration _configuration;
 
-        // Wstrzykujemy konfiguracj臋, by pobra膰 dane SMTP z appsettings.json
         public HomeController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -37,64 +36,52 @@ namespace Portfolio.Controllers
 
                     using (var client = new SmtpClient(host, port))
                     {
-                        // Kluczowe ustawienie - musi by膰 przed Credentials, by unikn膮膰 5.7.0 Authentication
                         client.UseDefaultCredentials = false;
                         client.Credentials = new NetworkCredential(username, password);
                         client.EnableSsl = true;
 
                         var mailMessage = new MailMessage
                         {
-                            // U偶ywamy z autoryzowanego konta e-mail do wysy艂ki jako nadawca
                             From = new MailAddress("kamileo04@gmail.com", "Portfolio Formularz"),
-                            Subject = $"Nowa wiadomo艣膰 z portfolio: {model.Subject ?? "Brak tematu"}",
-                            Body = $"Wiadomo艣膰 od: {model.Name} ({model.Email})\n\nTre艣膰:\n{model.Message}",
+                            Subject = $"Nowa wiadomo滄 z portfolio: {model.Subject ?? "Brak tematu"}",
+                            Body = $"Wiadomo滄 od: {model.Name} ({model.Email})\n\nTre滄:\n{model.Message}",
                             IsBodyHtml = false,
                         };
 
-                        // Aby m贸c normalnie "Odpowiedzie膰" na maila klikaj膮c w przycisk Odpowiedz:
                         mailMessage.ReplyToList.Add(new MailAddress(model.Email, model.Name));
 
-                        // Tutaj wpisz SW脫J adres email, na kt贸ry chcesz otrzymywa膰 wiadomo艣ci
                         mailMessage.To.Add("kamileo04@gmail.com");
 
                         client.Send(mailMessage);
                     }
 
-                    ViewBag.Message = "Wiadomo艣膰 zosta艂a wys艂ana pomy艣lnie!";
-                    ModelState.Clear(); // Czyszczenie formularza
+                    ViewBag.Message = "Wiadomo滄 zosta砤 wys砤na pomy渓nie!";
+                    ModelState.Clear(); 
                     return View(new ContactViewModel());
                 }
                 catch (Exception ex)
                 {
-                    // Wyrzucenie pe艂nego b艂臋du w oknie konsoli Output (Debug)
-                    System.Diagnostics.Debug.WriteLine("\n=== B艁膭D WYSY艁ANIA MAILA ===");
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    System.Diagnostics.Debug.WriteLine("============================\n");
-
-                    // Rzutowanie pe艂nego b艂臋du do logu w zwyk艂ej konsoli ASP.NET:
-                    Console.WriteLine("\n=== B艁膭D WYSY艁ANIA MAILA ===");
+                   
+                    Console.WriteLine("\n=== B％D WYSYANIA MAILA ===");
                     Console.WriteLine(ex.ToString());
                     Console.WriteLine("============================\n");
 
-                    // Rozbudowany log b艂臋du na stronie
-                    ViewBag.Error = $"Smtp Error 5.7.0 -> Username load check: {(!string.IsNullOrEmpty(username) ? username : "NULL_OR_EMPTY")}, pwdLen: {password?.Length ?? 0}. Msg: {ex.Message}";
+                    
                 }
             }
             else
             {
-                // Diagnostyka b艂臋d贸w walidacji formularza, je艣li mail w og贸le nie przeszed艂 walidacji
-                System.Diagnostics.Debug.WriteLine("\n=== B艁臉DY WALIDACJI FORMULARZA ===");
+                System.Diagnostics.Debug.WriteLine("\n=== BＪ楧Y WALIDACJI FORMULARZA ===");
                 foreach(var modelState in ModelState.Values)
                 {
                     foreach(var error in modelState.Errors)
                     {
-                        System.Diagnostics.Debug.WriteLine($"B艂膮d pol: {error.ErrorMessage}");
+                        System.Diagnostics.Debug.WriteLine($"B彻d pol: {error.ErrorMessage}");
                     }
                 }
                 System.Diagnostics.Debug.WriteLine("==================================\n");
             }
 
-            // Je艣li formularz jest niepoprawny, wracamy do widoku wy艣wietlaj膮c b艂臋dy
             return View(model);
         }
     }
