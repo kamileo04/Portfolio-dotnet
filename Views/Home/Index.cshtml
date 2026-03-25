@@ -771,16 +771,6 @@
     </p>
   </div>
   <form class="mx-auto w-full pt-10 sm:w-3/4" asp-controller="Home" asp-action="Index" method="post">
-    @if (ViewBag.Message != null) { 
-<div style="background-color: #d1fae5; color: #065f46; padding: 1rem; border-radius: 0.25rem; margin-bottom: 1rem;">
-     @ViewBag.Message
-</div> 
-}
-@if (ViewBag.Error != null) { 
-<div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 0.25rem; margin-bottom: 1rem;">
-     @ViewBag.Error
-</div> 
-}
     <div class="flex flex-col md:flex-row">
       <div class="mr-3 w-full md:w-1/2 lg:mr-5">
         <input asp-for="Name" class="w-full rounded border-grey-50 px-4 py-3 font-body text-black" placeholder="Name" />

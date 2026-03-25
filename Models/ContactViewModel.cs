@@ -4,7 +4,7 @@ namespace Portfolio.Models
 {
     public class ContactViewModel
     {
-        [Required(ErrorMessage = "Imiê jest wymagane")]
+        [Required(ErrorMessage = "ImiÄ™ jest wymagane")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Email jest wymagany")]
@@ -13,7 +13,7 @@ namespace Portfolio.Models
 
         public string? Subject { get; set; }
 
-        [Required(ErrorMessage = "Wiadomoœæ jest wymagana")]
+        [Required(ErrorMessage = "WiadomoÅ›Ä‡ jest wymagana")]
         public string Message { get; set; }
     }
 }

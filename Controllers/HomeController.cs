@@ -9,7 +9,6 @@ namespace Portfolio.Controllers
     {
         private readonly IConfiguration _configuration;
 
-        // Wstrzykujemy konfigurację, by pobrać dane SMTP z appsettings.json
         public HomeController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -37,52 +36,38 @@ namespace Portfolio.Controllers
 
                     using (var client = new SmtpClient(host, port))
                     {
-                        // Kluczowe ustawienie - musi być przed Credentials, by uniknąć 5.7.0 Authentication
                         client.UseDefaultCredentials = false;
                         client.Credentials = new NetworkCredential(username, password);
                         client.EnableSsl = true;
 
                         var mailMessage = new MailMessage
                         {
-                            // Używamy z autoryzowanego konta e-mail do wysyłki jako nadawca
                             From = new MailAddress("kamileo04@gmail.com", "Portfolio Formularz"),
                             Subject = $"Nowa wiadomość z portfolio: {model.Subject ?? "Brak tematu"}",
                             Body = $"Wiadomość od: {model.Name} ({model.Email})\n\nTreść:\n{model.Message}",
                             IsBodyHtml = false,
                         };
 
-                        // Aby móc normalnie "Odpowiedzieć" na maila klikając w przycisk Odpowiedz:
                         mailMessage.ReplyToList.Add(new MailAddress(model.Email, model.Name));
 
-                        // Tutaj wpisz SWÓJ adres email, na który chcesz otrzymywać wiadomości
                         mailMessage.To.Add("kamileo04@gmail.com");
 
                         client.Send(mailMessage);
                     }
 
                     ViewBag.Message = "Wiadomość została wysłana pomyślnie!";
-                    ModelState.Clear(); // Czyszczenie formularza
+                    ModelState.Clear();
                     return View(new ContactViewModel());
                 }
                 catch (Exception ex)
                 {
-                    // Wyrzucenie pełnego błędu w oknie konsoli Output (Debug)
-                    System.Diagnostics.Debug.WriteLine("\n=== BŁĄD WYSYŁANIA MAILA ===");
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    System.Diagnostics.Debug.WriteLine("============================\n");
-
-                    // Rzutowanie pełnego błędu do logu w zwykłej konsoli ASP.NET:
                     Console.WriteLine("\n=== BŁĄD WYSYŁANIA MAILA ===");
                     Console.WriteLine(ex.ToString());
                     Console.WriteLine("============================\n");
-
-                    // Rozbudowany log błędu na stronie
-                    ViewBag.Error = $"Smtp Error 5.7.0 -> Username load check: {(!string.IsNullOrEmpty(username) ? username : "NULL_OR_EMPTY")}, pwdLen: {password?.Length ?? 0}. Msg: {ex.Message}";
                 }
             }
             else
             {
-                // Diagnostyka błędów walidacji formularza, jeśli mail w ogóle nie przeszedł walidacji
                 System.Diagnostics.Debug.WriteLine("\n=== BŁĘDY WALIDACJI FORMULARZA ===");
                 foreach(var modelState in ModelState.Values)
                 {
@@ -94,7 +79,6 @@ namespace Portfolio.Controllers
                 System.Diagnostics.Debug.WriteLine("==================================\n");
             }
 
-            // Jeśli formularz jest niepoprawny, wracamy do widoku wyświetlając błędy
             return View(model);
         }
     }
